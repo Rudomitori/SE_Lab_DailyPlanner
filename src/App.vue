@@ -1,29 +1,37 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+    <div class="app-container container is-fullhd h-100vh is-flex is-align-items-center is-justify-content-center">
+        <div class="box app has-background-white-ter is-flex columns p-2">
+            <ScheduleGrid class="column is-10" ref="scheduleGrid"/>
+            <ControlSidebar class="column"
+                            @open-current-week="scheduleGrid.openCurrentWeek()"
+                            @open-next-week="scheduleGrid.openNextWeek()"
+                            @open-prev-week="scheduleGrid.openPrevWeek()"/>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+import {Component, Ref, Vue} from 'vue-property-decorator';
+import ScheduleGrid from "@/components/ScheduleGrid.vue";
+import ControlSidebar from "@/components/ControlSidebar.vue";
 
 @Component({
   components: {
-    HelloWorld,
+      ControlSidebar,
+      ScheduleGrid
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    @Ref() readonly scheduleGrid!: ScheduleGrid;
+}
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.app {
+    height: 45rem;
+    width: 100%;
+}
+
+.app-container {
 }
 </style>

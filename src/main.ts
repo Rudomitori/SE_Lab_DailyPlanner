@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import buefy from 'buefy'
 import 'buefy/dist/buefy.css'
+import "bulma/sass/utilities/_all.sass";
+import './index.scss'
 import {store} from "@/store";
 import App from './App.vue'
 

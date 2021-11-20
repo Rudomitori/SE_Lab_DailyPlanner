@@ -7,7 +7,6 @@ import TaskType from "@/Models/TaskType";
 import Task from "@/Models/Task";
 import Vue from "vue";
 import Vuex from 'vuex'
-import {delay} from "@/utils";
 
 class RootStoreState {
     hasNotSavedChanges: boolean = false;
@@ -48,7 +47,23 @@ class RootStoreState {
         };
 
         this.appSettings = {
-            storageSettingsArray: []
+            storageSettingsArray: [
+                {
+                    id: v4(),
+                    name: "В браузере",
+                    storageName: "LocalStorage",
+                },
+                {
+                    id:v4(),
+                    name: "На компьютере",
+                    storageName: "FileStorage"
+                },
+                {
+                    id:v4(),
+                    name: "В облаке",
+                    storageName: "CloudStorage"
+                }
+            ]
         };
     }
 }
@@ -104,9 +119,13 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
         this.mutations.addTask({task: newTask})
     }
 
-    async saveChanges({settingsName}: { settingsName?: string }) {
-        await delay(1500)
+    async saveSchedule({settingsId}: { settingsId?: string }) {
+        throw new Error("Сохранение не реализовано");
         this.mutations.setNoChanges()
+    }
+
+    async loadSchedule({settingsId}: { settingsId?: string }) {
+        throw new Error("Загрузка не реализована");
     }
 }
 
