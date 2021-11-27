@@ -59,16 +59,21 @@
 
 <script lang="ts">
 import {Component, Vue, Emit} from "vue-property-decorator";
-import {SnackbarProgrammatic} from "buefy";
+import {SnackbarProgrammatic, ModalProgrammatic} from "buefy";
 import {rootStoreModule} from "@/store";
+import SettingsComponent from '@/components/settings/SettingsComponent.vue'
 
 @Component
 export default class ControlSidebar extends Vue {
     openSettings() {
-        SnackbarProgrammatic.open({
+        /*SnackbarProgrammatic.open({
             message: "Раздел настроек ещё не реализован",
             type: 'is-warning',
             position: 'is-top',
+        });*/
+        ModalProgrammatic.open({
+            parent: this,
+            component: SettingsComponent
         })
     }
 
