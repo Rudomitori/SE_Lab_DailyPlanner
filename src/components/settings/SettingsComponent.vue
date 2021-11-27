@@ -7,6 +7,7 @@
             <div class="left-content">
                 <TimeSetting v-if="currentSetting == 1"/>
                 <StorageSetting v-if="currentSetting == 2"/>
+                <CategorySetting v-if="currentSetting == 3"/>
             </div>
             <div class="right-content">
                 <div class="setting-list">
@@ -31,10 +32,12 @@ import {Component, Vue} from "vue-property-decorator";
 import {SnackbarProgrammatic} from "buefy";
 import TimeSetting from '@/components/settings/TimeSetting.vue'
 import StorageSetting from '@/components/settings/StorageSetting.vue'
+import CategorySetting from '@/components/settings/CategorySetting.vue'
 @Component({
   components: {
       TimeSetting,
-      StorageSetting
+      StorageSetting,
+      CategorySetting
   },
 })
 export default class SettingsComponent extends Vue{
