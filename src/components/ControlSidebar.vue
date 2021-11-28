@@ -25,7 +25,9 @@
             <p class="control">
                 <b-dropdown position="is-bottom-left" :disabled="!hasChanges">
                     <template #trigger>
-                        <b-button type="is-info" label="+"/>
+                        <b-button type="is-info">
+                            <fa-icon icon="plus"/>
+                        </b-button>
                     </template>
 
                     <b-dropdown-item v-for="settings of storageSettings" @click="saveChanges(settings.id)">
@@ -44,7 +46,9 @@
             <p class="control">
                 <b-dropdown position="is-bottom-left">
                     <template #trigger>
-                        <b-button type="is-info" label="+"/>
+                        <b-button type="is-info">
+                            <fa-icon icon="plus"/>
+                        </b-button>
                     </template>
 
                     <b-dropdown-item v-for="settings of storageSettings" @click="loadSchedule(settings.id)">
