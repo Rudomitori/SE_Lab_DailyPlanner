@@ -1,12 +1,12 @@
 <template>
-    <div class="app-container container is-fullhd h-100vh is-flex is-align-items-center is-justify-content-center">
-        <div class="box app has-background-white-ter is-flex columns p-2">
-            <ScheduleGrid class="column is-10" ref="scheduleGrid"/>
-            <ControlSidebar class="column"
-                            @open-current-week="scheduleGrid.openCurrentWeek()"
-                            @open-next-week="scheduleGrid.openNextWeek()"
-                            @open-prev-week="scheduleGrid.openPrevWeek()"/>
-        </div>
+    <div class="has-background-white-ter is-flex p-3 h-100vh">
+        <ScheduleGrid class="w-100 p-3" ref="scheduleGrid"/>
+        <ControlSidebar
+            class="p-3"
+            @open-current-week="scheduleGrid.openCurrentWeek()"
+            @open-next-week="scheduleGrid.openNextWeek()"
+            @open-prev-week="scheduleGrid.openPrevWeek()"/>
+
     </div>
 </template>
 

@@ -8,6 +8,19 @@ export default interface Task {
     begin: Moment;
     end: Moment;
     isDone: boolean;
-    description?: string;
-    taskType?: TaskType
+    description: string | null;
+    taskType: TaskType | null
+}
+
+export function cloneTask(task: Task): Task {
+    return {
+        id: task.id,
+        typeId: task.typeId,
+        name: task.name,
+        begin: task.begin,
+        end: task.end,
+        isDone: task.isDone,
+        description: task.description,
+        taskType: task.taskType
+    }
 }

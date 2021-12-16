@@ -15,17 +15,23 @@
                  :style="label.gridPosition">
                 {{label.text}}
             </div>
+
+            <!-- Пустые ячейки -->
             <div class="has-background-warning h-100 w-100 has-dashed-border" v-for="cell of emptyCellDisplayVms"
                  :style="cell.gridPosition" @click="onEmptyCellClick(cell)">
             </div>
 
-            <div class="has-background-danger-dark has-text-white h-100 w-100 day-label task-header" v-for="vm of taskDisplayVms"
+            <!-- Задачи -->
+            <div class="has-background-danger-dark has-text-white h-100 w-100 task-cell" v-for="vm of taskDisplayVms"
                  :style="vm.gridPosition">
                 <b-checkbox size="is-small" :value="vm.isDone" @input="markTaskAsDone(vm.id, $event)"/>
                 <span class="truncated-text" :title="vm.name">
                     {{vm.name}}
                 </span>
-                <fa-icon icon="times-circle" size="xs" @click="removeTask(vm.id)"/>
+                <div class="task-action-container">
+                    <fa-icon icon="times-circle" size="xs" @click="removeTask(vm.id)"/>
+                    <fa-icon icon="edit" size="xs" @click="openTaskEditorModal(vm.id)"/>
+                </div>
             </div>
 
             <div class="has-background-warning h-100 w-100 has-dashed-border day-label" v-if="editedCellDisplayVm"
@@ -43,10 +49,11 @@
 
 <script lang="ts">
 import {Component, Ref, Vue} from "vue-property-decorator";
-import {SnackbarProgrammatic} from "buefy";
+import {ModalProgrammatic} from "buefy";
 import moment, {Duration, Moment} from "moment";
 import {rootStoreModule} from "@/store";
 import {delay} from "@/utils";
+import TaskEditorCard from "@/components/TaskEditorCard.vue";
 
 interface GridPosition {
     'grid-column-start': number,
@@ -246,44 +253,30 @@ export default class ScheduleGrid extends Vue {
         this.storeContext.actions.markTaskAsDone({taskId, isDone});
     }
 
+    openTaskEditorModal(taskId: string) {
+        ModalProgrammatic.open({
+            parent: this,
+            component: TaskEditorCard,
+            props: { taskId }
+        })
+    }
+
     private dateInSelectedWeek = moment();
 
     //#region Нафигация по неделям
 
     public openCurrentWeek() {
-        SnackbarProgrammatic.open({
-            message: "Переход на текущую неделю не реализован",
-            type: 'is-warning',
-            position: 'is-top',
-        })
+        this.dateInSelectedWeek = moment()
     }
 
     public openPrevWeek() {
-        SnackbarProgrammatic.open({
-            message: "Переход на предыдущую неделю не реализован",
-            type: 'is-warning',
-            position: 'is-top',
-        })
+        this.dateInSelectedWeek = this.dateInSelectedWeek.clone()
+            .subtract(1, 'week')
     }
 
     public openNextWeek() {
-        SnackbarProgrammatic.open({
-            message: "Переход на следующую неделю не реализован",
-            type: 'is-warning',
-            position: 'is-top',
-        })
-    }
-
-    /**
-     * @param date
-     * Дата в неделе, которую нужно открыть
-     */
-    public openWeek(date: Moment) {
-        SnackbarProgrammatic.open({
-            message: "Переход на определённую неделю не реализован",
-            type: 'is-warning',
-            position: 'is-top',
-        })
+        this.dateInSelectedWeek = this.dateInSelectedWeek.clone()
+            .add(1, 'week')
     }
 
     //#endregion
@@ -301,18 +294,29 @@ export default class ScheduleGrid extends Vue {
     justify-content: center;
 }
 
-.task-header {
-    padding: 2.5px;
-    * {
-        margin: 2.5px !important;
+.task-cell {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.25em;
+
+    > * {
+        margin: 0.25em;
     }
 
-    label.checkbox span.control-label {
-        padding: 0;
+    label.checkbox {
+        span.control-label {
+            padding: 0;
+        }
     }
 
-    :last-child {
-        align-self: flex-start;
+    .task-action-container {
+        height: 100%;
+
+        margin-left: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
     }
 }
 </style>

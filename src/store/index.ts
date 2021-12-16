@@ -97,7 +97,7 @@ class RootStoreMutations extends Mutations<RootStoreState> {
         this.state.hasNotSavedChanges = true;
     }
 
-    changeTask(task: Task) {
+    updateTask(task: Task) {
         const taskIndex = this.state.schedule.tasks.findIndex(x => x.id === task.id);
 
         if(taskIndex === -1) throw new Error();
@@ -123,9 +123,14 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
             end,
             taskType: defaultTaskType,
             isDone: false,
+            description: null
         }
 
         this.mutations.addTask({task: newTask})
+    }
+
+    updateTask(task: Task) {
+        this.mutations.updateTask(task)
     }
 
     removeTask(taskId: string) {
@@ -138,7 +143,7 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
         if(!task) throw new Error();
 
         task.isDone = isDone;
-        this.mutations.changeTask(task);
+        this.mutations.updateTask(task);
     }
 
     async saveSchedule({settingsId}: { settingsId?: string }) {
