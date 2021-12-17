@@ -25,6 +25,8 @@ import {Component, Prop, Watch} from "vue-property-decorator";
 import TaskEditorForm from "@/components/TaskEditorForm.vue";
 import {rootStoreModule} from "@/store";
 import Task, {cloneTask} from "@/Models/Task";
+import {NavPropertyCloneOption} from "@/utils";
+
 @Component({
     components: {TaskEditorForm}
 })
@@ -37,7 +39,7 @@ export default class TaskEditorCard extends Vue {
     onTaskIdChanged() {
         const task = this.storeContext.getters.tasks
             .find(x => x.id === this.taskId)!;
-        this.taskCopy = cloneTask(task)
+        this.taskCopy = cloneTask(task, NavPropertyCloneOption.Include)
     }
 
     created() {

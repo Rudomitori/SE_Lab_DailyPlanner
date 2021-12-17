@@ -70,40 +70,48 @@ class RootStoreState {
 
 class RootStoreGetters extends Getters<RootStoreState> {
     get tasks() {
-        return this.state.schedule.tasks;
+        return this.state.schedule.tasks!;
     }
 
     get taskTypes() {
-        return this.state.schedule.taskTypes;
+        return this.state.schedule.taskTypes!;
     }
 
     get defaultTaskType() {
-        return this.state.schedule.defaultTaskType
+        return this.state.schedule.defaultTaskType!
     }
 }
 
 class RootStoreMutations extends Mutations<RootStoreState> {
     addTask({task}: {task: Task}) {
-        this.state.schedule.tasks.push(task);
+        this.state.schedule.tasks!.push(task);
         this.state.hasNotSavedChanges = true;
     }
 
     removeTask({taskId}: {taskId: string}) {
-        const taskIndex = this.state.schedule.tasks.findIndex(x => x.id === taskId);
+        const taskIndex = this.state.schedule.tasks!.findIndex(x => x.id === taskId);
 
         if(taskIndex === -1) throw new Error();
 
-        this.state.schedule.tasks.splice(taskIndex, 1);
+        this.state.schedule.tasks!.splice(taskIndex, 1);
         this.state.hasNotSavedChanges = true;
     }
 
     updateTask(task: Task) {
-        const taskIndex = this.state.schedule.tasks.findIndex(x => x.id === task.id);
+        const taskIndex = this.state.schedule.tasks!.findIndex(x => x.id === task.id);
 
         if(taskIndex === -1) throw new Error();
 
-        this.state.schedule.tasks.splice(taskIndex, 1, task);
+        this.state.schedule.tasks!.splice(taskIndex, 1, task);
         this.state.hasNotSavedChanges = true;
+    }
+
+    updateSchedule(schedule: Schedule) {
+        const oldSchedule = this.state.schedule;
+        schedule.tasks ||= oldSchedule.tasks
+        schedule.taskTypes ||= oldSchedule.taskTypes
+        schedule.defaultTaskType = schedule.taskTypes!.find(x => x.id === schedule.defaultTaskTypeId)!
+        this.state.schedule = schedule;
     }
 
     setNoChanges() {
@@ -138,12 +146,16 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
     }
 
     markTaskAsDone({taskId, isDone}: {taskId: string, isDone: boolean}) {
-        const task = this.state.schedule.tasks.find(x => x.id === taskId);
+        const task = this.state.schedule.tasks!.find(x => x.id === taskId);
 
         if(!task) throw new Error();
 
         task.isDone = isDone;
         this.mutations.updateTask(task);
+    }
+
+    updateSchedule(schedule: Schedule) {
+        this.mutations.updateSchedule(schedule)
     }
 
     async saveSchedule({settingsId}: { settingsId?: string }) {

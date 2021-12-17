@@ -70,11 +70,6 @@ import SettingsComponent from '@/components/settings/SettingsComponent.vue'
 @Component
 export default class ControlSidebar extends Vue {
     openSettings() {
-        /*SnackbarProgrammatic.open({
-            message: "Раздел настроек ещё не реализован",
-            type: 'is-warning',
-            position: 'is-top',
-        });*/
         ModalProgrammatic.open({
             parent: this,
             component: SettingsComponent

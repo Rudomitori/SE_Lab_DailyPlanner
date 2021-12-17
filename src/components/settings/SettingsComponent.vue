@@ -1,87 +1,87 @@
 <template>
-    <div class="wrapper">
-        <div class="dialog-name">
-            <p>Настройки приложения</p>
-        </div>
-        <div class="content">
-            <div class="left-content">
-                <TimeSetting v-if="currentSetting == 1"/>
-                <StorageSetting v-if="currentSetting == 2"/>
-                <CategorySetting v-if="currentSetting == 3"/>
+    <div class="modal-card" style="width: auto">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Настройки приложения</p>
+            <div class="buttons">
+                <b-button
+                    label="Отмена"
+                    type="is-danger" outlined
+                    @click="$emit('close')" />
+                <b-button
+                    label="Принять"
+                    type="is-primary"
+                    @click="saveSettings"/>
             </div>
-            <div class="right-content">
-                <div class="setting-list">
-                    <button v-bind:class="{isButtonActive : currentSetting == 1}" @click="changeSetting(1)">Время</button>
-                    <button v-bind:class="{isButtonActive : currentSetting == 2}" @click="changeSetting(2)">Хранилище</button>
-                    <button v-bind:class="{isButtonActive : currentSetting == 3}" @click="changeSetting(3)">Категории</button>
-                </div>
-                <div class="setting-actions">
-                    <p class="control is-fullwidth is-expanded">
-                        <b-button label="Закрыть" type="is-info" @click="$emit('close')"/>
-                    </p>
-                    <p class="control is-fullwidth is-expanded">
-                        <b-button label="Сохранить" type="is-info" @click="saveSettings"/>
-                    </p>
-                </div>
-            </div>
-        </div>
+        </header>
+        <section class="modal-card-body brb p-0">
+            <b-tabs>
+                <b-tab-item label="Время">
+                    <TimeSetting v-model="scheduleCopy"/>
+                </b-tab-item>
+
+                <b-tab-item label="Хранилище">
+                    <StorageSetting v-model="scheduleCopy"/>
+                </b-tab-item>
+
+                <b-tab-item label="Категории">
+                    <CategorySetting v-model="scheduleCopy"/>
+                </b-tab-item>
+            </b-tabs>
+        </section>
     </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
-import {SnackbarProgrammatic} from "buefy";
+import {Component, Vue, Watch} from "vue-property-decorator";
 import TimeSetting from '@/components/settings/TimeSetting.vue'
 import StorageSetting from '@/components/settings/StorageSetting.vue'
 import CategorySetting from '@/components/settings/CategorySetting.vue'
+import {rootStoreModule} from "@/store";
+import Schedule, {cloneSchedule} from "@/Models/Schedule";
+import {NavPropertyCloneOption} from "@/utils";
+
 @Component({
   components: {
       TimeSetting,
       StorageSetting,
       CategorySetting
-  },
+  }
 })
-export default class SettingsComponent extends Vue{
-    public currentSetting : number = 1;
-    private saveSettings(){
-        SnackbarProgrammatic.open({
-            message: "Кнопка сохранить еще не реализована",
-            type: 'is-warning',
-            position: 'is-top',
-        });
-        console.log(this.currentSetting);
+export default class SettingsComponent extends Vue {
+    private scheduleCopy: Schedule|null = null;
+
+    get storeContext() {
+        return rootStoreModule.context(this.$store);
     }
-    private changeSetting(newSetting :number){
-        this.currentSetting = newSetting;
+
+    get currentSchedule() {
+        return this.storeContext.state.schedule;
+    }
+
+    @Watch("currentSchedule")
+    onCurrentScheduleChanged() {
+        this.scheduleCopy = cloneSchedule(this.currentSchedule,
+            NavPropertyCloneOption.SetNull,
+            NavPropertyCloneOption.Clone,
+            NavPropertyCloneOption.SetNull
+        );
+
+        this.scheduleCopy.defaultTaskType = this.scheduleCopy.taskTypes!
+            .find(x => x.id === this.scheduleCopy!.defaultTaskTypeId)!
+    }
+
+    created() {
+        this.onCurrentScheduleChanged()
+    }
+
+    private saveSettings() {
+        this.storeContext.actions.updateSchedule(this.scheduleCopy!)
+        this.$emit('close')
     }
 }
 </script>
 <style scoped>
-    .wrapper{
-        background: white;
-    }
-    .dialog-name{
-        border-bottom: 1px solid #c9c9c9;
-        padding: 5px 10px;
-    }
     .dialog-name p{
         font-size: 2em;
-    }
-    .content{
-        display: flex;
-        height: 500px;
-    }
-    .left-content{
-        width: 75%;
-        padding: 10px;
-    }
-    .right-content{
-        width: 25%;
-        position: relative;
-        border-left: 1px solid #c9c9c9;
-        padding: 10px;
-    }
-    .setting-list{
-        height: 75%;
     }
     .setting-list button{
         display: block;
@@ -95,17 +95,7 @@ export default class SettingsComponent extends Vue{
     .setting-list button:hover{
         text-decoration: underline;
     }
-    .setting-actions{
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-    }
     .setting-actions button{
         width: 100%;
     }
-    .isButtonActive{
-        text-decoration: underline;
-    }
-
 </style>

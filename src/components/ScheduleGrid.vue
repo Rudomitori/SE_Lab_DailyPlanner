@@ -79,15 +79,15 @@ export default class ScheduleGrid extends Vue {
     }
 
     get scheduleName() {
-        return rootStoreModule.context(this.$store)
+        return this.storeContext
             .state.schedule.name;
+
     }
 
     get taskOfSelectedWeek() {
         const begin = this.dateInSelectedWeek.clone().startOf('isoWeek');
         const end = this.dateInSelectedWeek.clone().endOf('isoWeek');
-        const tasks = rootStoreModule.context(this.$store)
-            .state.schedule.tasks;
+        const tasks = this.storeContext.getters.tasks;
 
         return tasks.filter(x =>
             x.begin.diff(begin) >= 0 && x.begin.diff(end) <= 0
@@ -96,7 +96,7 @@ export default class ScheduleGrid extends Vue {
     }
 
     get segmentsPerDay() {
-        const context = rootStoreModule.context(this.$store);
+        const context = this.storeContext;
 
         const dayBegin = context.state.schedule.dayBegin;
         const dayEnd = context.state.schedule.dayEnd;
@@ -132,7 +132,7 @@ export default class ScheduleGrid extends Vue {
     }
 
     get emptyCellDisplayVms() {
-        const context = rootStoreModule.context(this.$store);
+        const context = this.storeContext;
 
         const cellData = [] as EmptyCellDisplayVm[];
         let time = context.state.schedule.dayBegin.clone();
