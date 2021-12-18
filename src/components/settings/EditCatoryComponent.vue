@@ -1,66 +1,54 @@
 <template>
     <div class="modal-card" style="width: 500px;margin: 0 auto;">
     <header class="modal-card-head">
-        <p class="modal-card-title">{{ Title }}</p>
-        <button
-            type="button"
-            class="delete"
-            @click="$emit('close')"/>
+        <p class="modal-card-title">Редактирование категории</p>
+        <b-button
+            label="Принять"
+            @click="$emit('close')"
+            type="is-primary" />
     </header>
-    <section class="modal-card-body">
+    <section class="modal-card-body brb">
         <b-field label="Название категории" horizontal>
             <b-input
                 type="text"
-                :value="Name"
+                v-model="taskType.name"
                 placeholder="Название категории"
-                @input="OnChangeName"
                 required>
             </b-input>
         </b-field>
 
-        <b-field label="Цвет" horizontal>
-            <b-input
-                type="color"
-                :value="Color"
-                @input="OnChangeColor"
-                required>
-            </b-input>
+        <b-field label="Цвет фона" horizontal>
+            <b-input type="color" v-model="backgroundColor" required/>
+        </b-field>
+        <b-field label="Цвет текста" horizontal>
+            <b-input type="color" v-model="textColor" required/>
         </b-field>
     </section>
-    <footer class="modal-card-foot">
-        <b-button
-            label="Отмена"
-            @click="$emit('close')" />
-        <b-button
-            :label="BtnText"
-            @click="save()"
-            type="is-primary" />
-    </footer>
 </div>
 
 </template>
 <script lang="ts">
-import {Component, Vue, Prop} from "vue-property-decorator";
+import {Component, Vue, VModel} from "vue-property-decorator";
+import TaskType from "@/Models/TaskType";
 @Component
-export default class EditCategoryComponent extends Vue{
-    @Prop() public Name? : string;
-    @Prop() public Color? : string;
-    @Prop() public Title? : string;
-    @Prop() public BtnText? : string;
+export default class EditCategoryComponent extends Vue {
+    @VModel({required: true, })
+    readonly taskType!: TaskType;
 
-    private name?:string; 
-    private color?:string; 
+    private get backgroundColor() {
+        return this.taskType.colors[0]
+    }
 
-    private save(){
-        this.name = this.name || this.Name;
-        this.color = this.color || this.Name;
-        this.$emit('save',{'Name': this.name, 'Color':this.color});
+    private set backgroundColor(color: string) {
+        this.taskType.colors.splice(0, 1, color)
     }
-    private OnChangeName(value: any){
-        this.name = value;
+
+    private get textColor() {
+        return this.taskType.colors[1]
     }
-    private OnChangeColor(value: any){
-        this.color = value;
+
+    private set textColor(color: string) {
+        this.taskType.colors.splice(1, 1, color)
     }
 }
 </script>

@@ -22,8 +22,8 @@
             </div>
 
             <!-- Задачи -->
-            <div class="has-background-danger-dark has-text-white h-100 w-100 task-cell" v-for="vm of taskDisplayVms"
-                 :style="vm.gridPosition">
+            <div class="h-100 w-100 task-cell" v-for="vm of taskDisplayVms"
+                 :style="vm.styles">
                 <b-checkbox size="is-small" :value="vm.isDone" @input="markTaskAsDone(vm.id, $event)"/>
                 <span class="truncated-text" :title="vm.name">
                     {{vm.name}}
@@ -194,12 +194,14 @@ export default class ScheduleGrid extends Vue {
                 name: x.name,
                 id: x.id,
                 isDone: x.isDone,
-                gridPosition: {
+                styles: {
                     'grid-column-start': 2 + moment.duration(x.begin.diff(weekBegin)).days(),
                     'grid-column-end': 3 + moment.duration(x.begin.diff(weekBegin)).days(),
                     'grid-row-start': 2 + rowStart,
-                    'grid-row-end': 2 + rowEnd
-                }
+                    'grid-row-end': 2 + rowEnd,
+                    'background-color': x.taskType!.colors[0],
+                    'color': x.taskType!.colors[1]
+                },
             });
         });
         console.log(map);
@@ -263,7 +265,7 @@ export default class ScheduleGrid extends Vue {
 
     private dateInSelectedWeek = moment();
 
-    //#region Нафигация по неделям
+    //#region Навигация по неделям
 
     public openCurrentWeek() {
         this.dateInSelectedWeek = moment()

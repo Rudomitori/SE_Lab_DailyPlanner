@@ -14,7 +14,7 @@
             </div>
         </header>
         <section class="modal-card-body brb p-0">
-            <b-tabs>
+            <b-tabs :animated="false">
                 <b-tab-item label="Время">
                     <TimeSetting v-model="scheduleCopy"/>
                 </b-tab-item>
@@ -24,7 +24,7 @@
                 </b-tab-item>
 
                 <b-tab-item label="Категории">
-                    <CategorySetting v-model="scheduleCopy"/>
+                    <CategorySetting v-model="scheduleCopy.taskTypes"/>
                 </b-tab-item>
             </b-tabs>
         </section>

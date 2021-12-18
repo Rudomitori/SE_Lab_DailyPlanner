@@ -19,7 +19,7 @@ class RootStoreState {
         const defaultTaskType: TaskType = {
             id: defaultTaskTypeId,
             name: "Тип задачи по умолчанию",
-            colors: [],
+            colors: ['#464646', '#FFFFFF'],
             font: "Aria",
             priority: 10
         };
