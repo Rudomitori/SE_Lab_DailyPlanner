@@ -204,7 +204,6 @@ export default class ScheduleGrid extends Vue {
                 },
             });
         });
-        console.log(map);
         return map;
     }
 

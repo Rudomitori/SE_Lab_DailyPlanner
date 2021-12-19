@@ -20,7 +20,7 @@
         <!--#region Кнопка сохранения-->
         <b-field class="w-100">
             <p class="control is-fullwidth is-expanded">
-                <b-button label="Сохранить" expanded type="is-info" :disabled="!hasChanges" @click="saveChanges"/>
+                <b-button label="Сохранить" expanded type="is-info" :disabled="!hasChanges" @click="saveByLastMethod"/>
             </p>
             <p class="control">
                 <b-dropdown position="is-bottom-left" :disabled="!hasChanges">
@@ -30,8 +30,8 @@
                         </b-button>
                     </template>
 
-                    <b-dropdown-item v-for="settings of storageSettings" @click="saveChanges(settings.id)">
-                        {{ settings.name }}
+                    <b-dropdown-item @click="openLocalSavingModal">
+                        Сохранить в браузере
                     </b-dropdown-item>
                 </b-dropdown>
             </p>
@@ -41,7 +41,7 @@
         <!--#region Кнопка загрузки-->
         <b-field class="w-100">
             <p class="control is-fullwidth is-expanded">
-                <b-button label="Загрузить" expanded type="is-info" @click="loadSchedule"/>
+                <b-button label="Загрузить" expanded type="is-info" @click="loadByLastMethod"/>
             </p>
             <p class="control">
                 <b-dropdown position="is-bottom-left">
@@ -51,8 +51,8 @@
                         </b-button>
                     </template>
 
-                    <b-dropdown-item v-for="settings of storageSettings" @click="loadSchedule(settings.id)">
-                        {{ settings.name }}
+                    <b-dropdown-item @click="openLocalSavingModal">
+                        Загрузить из браузера
                     </b-dropdown-item>
                 </b-dropdown>
             </p>
@@ -66,9 +66,16 @@ import {Component, Vue, Emit} from "vue-property-decorator";
 import {SnackbarProgrammatic, ModalProgrammatic} from "buefy";
 import {rootStoreModule} from "@/store";
 import SettingsComponent from '@/components/settings/SettingsComponent.vue'
+import LocalSaveLoadCard from "@/components/LocalSaveLoadCard.vue";
+import {StorageTypes} from "@/Models/AppSettings";
+import {localStorageService} from "@/Storages";
 
 @Component
 export default class ControlSidebar extends Vue {
+    get storeContext() {
+        return rootStoreModule.context(this.$store);
+    }
+
     openSettings() {
         ModalProgrammatic.open({
             parent: this,
@@ -76,44 +83,38 @@ export default class ControlSidebar extends Vue {
         })
     }
 
-    async saveChanges(settingsId?: string) {
-        try {
-            await rootStoreModule.context(this.$store)
-                .actions.saveSchedule({settingsId})
-        } catch (e: any) {
-            if(e instanceof Error) {
-                SnackbarProgrammatic.open({
-                    message: e.message,
-                    type: 'is-warning',
-                    position: 'is-top',
-                })
-            }
-        }
-    }
-
-    async loadSchedule(settingsId?: string) {
-        try {
-            await rootStoreModule.context(this.$store)
-                .actions.loadSchedule({settingsId})
-        } catch (e: any) {
-            if(e instanceof Error) {
-                SnackbarProgrammatic.open({
-                    message: e.message,
-                    type: 'is-warning',
-                    position: 'is-top',
-                })
-            }
-        }
-    }
-
     get hasChanges() {
         return rootStoreModule.context(this.$store)
             .state.hasNotSavedChanges
     }
 
-    get storageSettings() {
-        return rootStoreModule.context(this.$store)
-            .state.appSettings.storageSettingsArray
+    saveByLastMethod() {
+        const appSettings = this.storeContext.state.appSettings;
+        switch (appSettings.lastStorageType) {
+            case StorageTypes.Local:
+                if(appSettings.lastLocalStorageKey !== null)
+                    this.storeContext.actions.saveScheduleToLocalStorage(appSettings.lastLocalStorageKey)
+                else
+                    this.openLocalSavingModal()
+        }
+    }
+
+    loadByLastMethod() {
+        const appSettings = this.storeContext.state.appSettings;
+        switch (appSettings.lastStorageType) {
+            case StorageTypes.Local:
+                if(appSettings.lastLocalStorageKey !== null)
+                    this.storeContext.actions.loadScheduleFromLocalStorage(appSettings.lastLocalStorageKey)
+                else
+                    this.openLocalSavingModal()
+        }
+    }
+
+    openLocalSavingModal() {
+        ModalProgrammatic.open({
+            parent: this,
+            component: LocalSaveLoadCard
+        })
     }
 
     @Emit()

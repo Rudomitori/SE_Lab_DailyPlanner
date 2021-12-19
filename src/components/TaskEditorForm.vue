@@ -23,7 +23,7 @@
                 :open-on-focus="true"
                 :data="taskTypes"
                 field="name"
-                @select="option => (task.taskType = option)"/>
+                @select="onTaskTypeSelected"/>
         </b-field>
 
         <b-field label="Описание" 
@@ -39,6 +39,7 @@ import {Component, VModel} from "vue-property-decorator";
 import {rootStoreModule} from "@/store";
 import Task from "@/Models/Task";
 import moment from "moment";
+import TaskType from "@/Models/TaskType";
 
 @Component
 export default class TaskEditorForm extends Vue {
@@ -67,6 +68,11 @@ export default class TaskEditorForm extends Vue {
 
     get taskTypes() {
         return this.storeContext.getters.taskTypes
+    }
+
+    onTaskTypeSelected(taskType: TaskType) {
+        this.task.taskType = taskType
+        this.task.typeId = taskType.id
     }
 }
 </script>

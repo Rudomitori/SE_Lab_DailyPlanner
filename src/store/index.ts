@@ -1,12 +1,13 @@
 import {Actions, createStore, Getters, Module, Mutations} from "vuex-smart-module";
 import Schedule from "@/Models/Schedule";
-import AppSettings from "@/Models/AppSettings";
+import AppSettings, {StorageTypes} from "@/Models/AppSettings";
 import moment, {Moment} from "moment";
 import {v4} from "uuid";
 import TaskType from "@/Models/TaskType";
 import Task from "@/Models/Task";
 import Vue from "vue";
 import Vuex from 'vuex'
+import {localStorageService} from "@/Storages";
 
 class RootStoreState {
     hasNotSavedChanges: boolean = false;
@@ -46,24 +47,9 @@ class RootStoreState {
             defaultTaskType
         };
 
-        this.appSettings = {
-            storageSettingsArray: [
-                {
-                    id: v4(),
-                    name: "В браузере",
-                    storageName: "LocalStorage",
-                },
-                {
-                    id:v4(),
-                    name: "На компьютере",
-                    storageName: "FileStorage"
-                },
-                {
-                    id:v4(),
-                    name: "В облаке",
-                    storageName: "CloudStorage"
-                }
-            ]
+        this.appSettings = localStorageService.loadAppSettings() || {
+            lastLocalStorageKey: null,
+            lastStorageType: StorageTypes.Local
         };
     }
 }
@@ -111,11 +97,19 @@ class RootStoreMutations extends Mutations<RootStoreState> {
         schedule.tasks ||= oldSchedule.tasks
         schedule.taskTypes ||= oldSchedule.taskTypes
         schedule.defaultTaskType = schedule.taskTypes!.find(x => x.id === schedule.defaultTaskTypeId)!
-        this.state.schedule = schedule;
+        for (const task of schedule.tasks!) {
+            task.taskType ||= schedule.taskTypes!.find(x => x.id === task.typeId)!
+        }
+        this.state.schedule = schedule
+        this.state.hasNotSavedChanges = true
     }
 
     setNoChanges() {
         this.state.hasNotSavedChanges = false;
+    }
+
+    updateAppSettings(settings: AppSettings) {
+        this.state.appSettings = settings
     }
 }
 
@@ -141,6 +135,16 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
         this.mutations.updateTask(task)
     }
 
+    $init() {
+        const appSettings = this.state.appSettings;
+        switch (appSettings.lastStorageType){
+            case StorageTypes.Local:
+                const key = appSettings.lastLocalStorageKey;
+                if(key !== null)
+                    this.actions.loadScheduleFromLocalStorage(key)
+        }
+    }
+
     removeTask(taskId: string) {
         this.mutations.removeTask({taskId});
     }
@@ -158,14 +162,45 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
         this.mutations.updateSchedule(schedule)
     }
 
-    async saveSchedule({settingsId}: { settingsId?: string }) {
-        throw new Error("Сохранение не реализовано");
-        this.mutations.setNoChanges()
+    updateAppSettings(settings: AppSettings) {
+        this.mutations.updateAppSettings(settings)
+
+        localStorageService.saveAppSettings(settings)
     }
 
-    async loadSchedule({settingsId}: { settingsId?: string }) {
-        throw new Error("Загрузка не реализована");
+    //#region LocalStorage
+
+    loadScheduleFromLocalStorage(key: string) {
+        const schedule = localStorageService.loadSchedule(key)
+        this.mutations.updateSchedule(schedule)
+
+        this.mutations.setNoChanges()
+        this.actions.updateAppSettings({
+            lastLocalStorageKey: key,
+            lastStorageType: StorageTypes.Local
+        })
     }
+
+    saveScheduleToLocalStorage(key: string) {
+        localStorageService.saveSchedule(this.state.schedule, key)
+
+        this.mutations.setNoChanges()
+        this.actions.updateAppSettings({
+            lastLocalStorageKey: key,
+            lastStorageType: StorageTypes.Local
+        })
+    }
+
+    removeScheduleFromLocalStorage(key: string) {
+        localStorageService.removeSchedule(key)
+        if(this.state.appSettings.lastLocalStorageKey === key)
+            this.actions.updateAppSettings({
+                lastLocalStorageKey: null,
+                lastStorageType: this.state.appSettings.lastStorageType
+            })
+    }
+
+    //#endregion
 }
 
 export const rootStoreModule = new Module({
