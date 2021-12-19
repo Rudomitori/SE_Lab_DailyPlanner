@@ -1,40 +1,40 @@
 <template>
     <div class="is-flex is-flex-direction-column h-100">
-        <h3 class="is-size-3">{{scheduleName}}</h3>
-        <div class="is-flex-grow-1 is-flex-shrink-1 h-100 w-100 has-background-grey schedule-grid" :style="gridStyles">
+        <h3 class="is-size-5 box mb-3">{{scheduleName}}</h3>
+        <div class="is-flex-grow-1 is-flex-shrink-1 h-100 w-100 schedule-grid box" :style="gridStyles">
             <!--Дата-->
-            <div class="has-background-primary-dark has-text-white h-100 w-100 day-label has-dashed-border"
+            <div class="h-100 w-100 day-label has-dashed-border"
                  v-for="label of dayLabels"
                  :style="label.gridPosition">
-                {{label.text}}
+                <b-tag type="is-primary" size="is-medium">{{label.text}}</b-tag>
             </div>
 
             <!--Время-->
-            <div class="has-background-info-dark has-text-white h-100 w-100 day-label has-dashed-border"
+            <div class="h-100 w-100 day-label has-dashed-border"
                  v-for="label of timeLabels"
                  :style="label.gridPosition">
-                {{label.text}}
+                <b-tag type="is-primary" size="is-medium">{{label.text}}</b-tag>
             </div>
 
             <!-- Пустые ячейки -->
-            <div class="has-background-warning h-100 w-100 has-dashed-border" v-for="cell of emptyCellDisplayVms"
+            <div class="h-100 w-100 has-dashed-border" v-for="cell of emptyCellDisplayVms"
                  :style="cell.gridPosition" @click="onEmptyCellClick(cell)">
             </div>
 
             <!-- Задачи -->
-            <div class="h-100 w-100 task-cell" v-for="vm of taskDisplayVms"
+            <div class="h-100 w-100 task-cell box" v-for="vm of taskDisplayVms"
                  :style="vm.styles">
                 <b-checkbox size="is-small" :value="vm.isDone" @input="markTaskAsDone(vm.id, $event)"/>
                 <span class="truncated-text" :title="vm.name">
                     {{vm.name}}
                 </span>
                 <div class="task-action-container">
-                    <fa-icon icon="times-circle" size="xs" @click="removeTask(vm.id)"/>
-                    <fa-icon icon="edit" size="xs" @click="openTaskEditorModal(vm.id)"/>
+                    <fa-icon icon="times-circle" class="is-clickable" size="xs" @click="removeTask(vm.id)"/>
+                    <fa-icon icon="edit" class="is-clickable" size="xs" @click="openTaskEditorModal(vm.id)"/>
                 </div>
             </div>
 
-            <div class="has-background-warning h-100 w-100 has-dashed-border day-label" v-if="editedCellDisplayVm"
+            <div class="h-100 w-100 has-dashed-border day-label" v-if="editedCellDisplayVm"
                  :style="editedCellDisplayVm.gridPosition">
                 <b-input v-model="editedCellDisplayVm.value" size="is-small"
                          @keypress.enter.native="onEditedCellEndInput"
@@ -288,12 +288,25 @@ export default class ScheduleGrid extends Vue {
 <style lang="scss">
 .schedule-grid {
     display: grid;
+    overflow: auto;
 }
 
 .day-label {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.v-grey-line-background {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 44%, rgba(215,215,215,1) 45%, rgba(215,215,215,1) 55%, rgba(255,255,255,0) 56%);
+}
+.h-grey-line-background {
+    background: linear-gradient(0deg, rgba(255,255,255,0) 44%, rgba(215,215,215,1) 45%, rgba(215,215,215,1) 55%, rgba(255,255,255,0) 56%);
+}
+.vh-grey-line-background {
+    background:
+        linear-gradient(0deg, rgba(255,255,255,0) 44%, rgba(215,215,215,1) 45%, rgba(215,215,215,1) 55%, rgba(255,255,255,0) 56%),
+        linear-gradient(90deg, rgba(255,255,255,0) 44%, rgba(215,215,215,1) 45%, rgba(215,215,215,1) 55%, rgba(255,255,255,0) 56%);
 }
 
 .task-cell {

@@ -1,5 +1,5 @@
 <template>
-    <div class="buttons is-flex is-flex-direction-column">
+    <div class="is-flex is-flex-direction-column box">
         <!--Кнопка настройки-->
         <b-button expanded type="is-ghost" @click="openSettings">Настройки</b-button>
 
@@ -18,7 +18,7 @@
         <!--#endregion-->
 
         <!--#region Кнопка сохранения-->
-        <b-field class="mt-auto w-100">
+        <b-field class="w-100">
             <p class="control is-fullwidth is-expanded">
                 <b-button label="Сохранить" expanded type="is-info" :disabled="!hasChanges" @click="saveChanges"/>
             </p>

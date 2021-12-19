@@ -1,6 +1,6 @@
 <template>
     <div class="has-background-white-ter is-flex p-3 h-100vh">
-        <ScheduleGrid class="w-100 p-3" ref="scheduleGrid"/>
+        <ScheduleGrid class="w-100 pr-3" ref="scheduleGrid"/>
         <ControlSidebar
             class="p-3"
             @open-current-week="scheduleGrid.openCurrentWeek()"
