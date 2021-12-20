@@ -33,6 +33,9 @@
                     <b-dropdown-item @click="openLocalSavingModal">
                         Сохранить в браузере
                     </b-dropdown-item>
+                    <b-dropdown-item @click="saveScheduleToFile">
+                        Сохранить в файл
+                    </b-dropdown-item>
                 </b-dropdown>
             </p>
         </b-field>
@@ -54,6 +57,9 @@
                     <b-dropdown-item @click="openLocalSavingModal">
                         Загрузить из браузера
                     </b-dropdown-item>
+                    <b-dropdown-item @click="loadScheduleFromFile">
+                        Загрузить из файла
+                    </b-dropdown-item>
                 </b-dropdown>
             </p>
         </b-field>
@@ -63,12 +69,11 @@
 
 <script lang="ts">
 import {Component, Vue, Emit} from "vue-property-decorator";
-import {SnackbarProgrammatic, ModalProgrammatic} from "buefy";
+import {ModalProgrammatic} from "buefy";
 import {rootStoreModule} from "@/store";
 import SettingsComponent from '@/components/settings/SettingsComponent.vue'
 import LocalSaveLoadCard from "@/components/LocalSaveLoadCard.vue";
 import {StorageTypes} from "@/Models/AppSettings";
-import {localStorageService} from "@/Storages";
 
 @Component
 export default class ControlSidebar extends Vue {
@@ -96,6 +101,9 @@ export default class ControlSidebar extends Vue {
                     this.storeContext.actions.saveScheduleToLocalStorage(appSettings.lastLocalStorageKey)
                 else
                     this.openLocalSavingModal()
+                break;
+            case StorageTypes.File:
+                this.storeContext.actions.saveScheduleToFile()
         }
     }
 
@@ -107,6 +115,9 @@ export default class ControlSidebar extends Vue {
                     this.storeContext.actions.loadScheduleFromLocalStorage(appSettings.lastLocalStorageKey)
                 else
                     this.openLocalSavingModal()
+                break;
+            case StorageTypes.File:
+                this.storeContext.actions.loadScheduleFromFile();
         }
     }
 
@@ -115,6 +126,14 @@ export default class ControlSidebar extends Vue {
             parent: this,
             component: LocalSaveLoadCard
         })
+    }
+
+    saveScheduleToFile() {
+        this.storeContext.actions.saveScheduleToFile()
+    }
+
+    loadScheduleFromFile() {
+        this.storeContext.actions.loadScheduleFromFile()
     }
 
     @Emit()

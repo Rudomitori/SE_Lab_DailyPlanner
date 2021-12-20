@@ -42,10 +42,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {Component, Prop, Watch} from "vue-property-decorator";
+import {Component} from "vue-property-decorator";
 import TaskEditorForm from "@/components/TaskEditorForm.vue";
 import {rootStoreModule} from "@/store";
-import {localStorageService} from "@/Storages";
+import localStorageService from "@/storages/localStorageService";
 
 @Component({
     components: {TaskEditorForm}

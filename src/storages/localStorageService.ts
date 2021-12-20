@@ -1,10 +1,10 @@
 import Schedule, {cloneSchedule} from "@/Models/Schedule";
-import AppSettings from "@/Models/AppSettings";
 import {cloneTask} from "@/Models/Task";
 import {cloneTaskType} from "@/Models/TaskType";
 import moment from "moment";
+import AppSettings from "@/Models/AppSettings";
 
-export const localStorageService = {
+const localStorageService = {
     saveSchedule(schedule: Schedule, saveName: string) {
         const clonedSchedule = cloneSchedule(schedule);
         clonedSchedule.tasks = schedule.tasks!.map(x => cloneTask(x));
@@ -52,3 +52,6 @@ export const localStorageService = {
         localStorage.removeItem("__" + key);
     }
 }
+
+export default localStorageService;
+

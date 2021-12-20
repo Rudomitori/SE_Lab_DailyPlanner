@@ -7,7 +7,8 @@ import TaskType from "@/Models/TaskType";
 import Task from "@/Models/Task";
 import Vue from "vue";
 import Vuex from 'vuex'
-import {localStorageService} from "@/Storages";
+import localStorageService from "@/storages/localStorageService";
+import fileStorageService from "@/storages/fileStorageService";
 
 class RootStoreState {
     hasNotSavedChanges: boolean = false;
@@ -142,6 +143,10 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
                 const key = appSettings.lastLocalStorageKey;
                 if(key !== null)
                     this.actions.loadScheduleFromLocalStorage(key)
+                break;
+            // File chooser dialog can only be shown with a user activation
+            // case StorageTypes.File:
+            //     this.actions.loadScheduleFromFile()
         }
     }
 
@@ -198,6 +203,29 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
                 lastLocalStorageKey: null,
                 lastStorageType: this.state.appSettings.lastStorageType
             })
+    }
+
+    saveScheduleToFile() {
+        fileStorageService.saveSchedule(this.state.schedule)
+
+        this.mutations.setNoChanges();
+        this.actions.updateAppSettings({
+            lastLocalStorageKey: this.state.appSettings.lastLocalStorageKey,
+            lastStorageType: StorageTypes.File
+        })
+    }
+
+    async loadScheduleFromFile() {
+        const schedule = await fileStorageService.loadSchedule();
+        if(!schedule) return;
+        this.mutations.updateSchedule(schedule)
+
+        this.mutations.setNoChanges()
+        this.actions.updateAppSettings({
+            lastLocalStorageKey: this.state.appSettings.lastLocalStorageKey,
+            lastStorageType: StorageTypes.File
+        })
+
     }
 
     //#endregion
