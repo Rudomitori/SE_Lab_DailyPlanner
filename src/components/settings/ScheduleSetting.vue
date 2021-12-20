@@ -1,19 +1,17 @@
 <template>
     <div>
-        <div class="title">
-            <p>Настройки времени</p>
-        </div>
-        <div>
-            <b-field horizontal label="Начало дня">
-                <b-input type="time" v-model="dayBegin" :max="dayEnd"/>
-            </b-field>
-            <b-field horizontal label="Конец дня">
-                <b-input type="time" v-model="dayEnd" :min="dayBegin"/>
-            </b-field>
-            <b-field horizontal label="Промежуток">
-                <b-input type="time" v-model="segmentLength" min="00:15" :max="maxSegmentLength" step="900"/>
-            </b-field>
-        </div>
+        <b-field horizontal label="Имя расписания" label-position="on-border">
+            <b-input v-model="schedule.name" />
+        </b-field>
+        <b-field horizontal label="Начало дня">
+            <b-input type="time" v-model="dayBegin" :max="dayEnd"/>
+        </b-field>
+        <b-field horizontal label="Конец дня">
+            <b-input type="time" v-model="dayEnd" :min="dayBegin"/>
+        </b-field>
+        <b-field horizontal label="Промежуток">
+            <b-input type="time" v-model="segmentLength" min="00:15" :max="maxSegmentLength" step="900"/>
+        </b-field>
     </div>
 </template>
 <script lang="ts">
@@ -26,7 +24,7 @@ const timePartFormatter = Intl.NumberFormat(undefined, {
 });
 
 @Component
-export default class TimeSetting extends Vue {
+export default class ScheduleSetting extends Vue {
     @VModel({required: true})
     readonly schedule!: Schedule;
 

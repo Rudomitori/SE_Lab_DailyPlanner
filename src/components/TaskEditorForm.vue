@@ -17,13 +17,9 @@
         </b-field>
 
         <b-field label="Тип" label-position="on-border">
-            <b-autocomplete
-                aria-required="true"
-                :value="task.taskType.name"
-                :open-on-focus="true"
-                :data="taskTypes"
-                field="name"
-                @select="onTaskTypeSelected"/>
+            <b-select :value="task.typeId" @input="onTaskTypeSelected($event)">
+                <option v-for="type of taskTypes" :value="type.id">{{ type.name }}</option>
+            </b-select>
         </b-field>
 
         <b-field label="Описание" 
@@ -70,7 +66,8 @@ export default class TaskEditorForm extends Vue {
         return this.storeContext.getters.taskTypes
     }
 
-    onTaskTypeSelected(taskType: TaskType) {
+    onTaskTypeSelected(typeId: string) {
+        const taskType = this.taskTypes.find(x => x.id === typeId)!;
         this.task.taskType = taskType
         this.task.typeId = taskType.id
     }

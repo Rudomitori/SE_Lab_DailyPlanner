@@ -15,12 +15,8 @@
         </header>
         <section class="modal-card-body brb p-0">
             <b-tabs :animated="false">
-                <b-tab-item label="Время">
+                <b-tab-item label="Расписание">
                     <TimeSetting v-model="scheduleCopy"/>
-                </b-tab-item>
-
-                <b-tab-item label="Хранилище">
-                    <StorageSetting v-model="scheduleCopy"/>
                 </b-tab-item>
 
                 <b-tab-item label="Категории">
@@ -32,7 +28,7 @@
 </template>
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
-import TimeSetting from '@/components/settings/TimeSetting.vue'
+import ScheduleSetting from '@/components/settings/ScheduleSetting.vue'
 import StorageSetting from '@/components/settings/StorageSetting.vue'
 import CategorySetting from '@/components/settings/CategorySetting.vue'
 import {rootStoreModule} from "@/store";
@@ -41,7 +37,7 @@ import {NavPropertyCloneOption} from "@/utils";
 
 @Component({
   components: {
-      TimeSetting,
+      TimeSetting: ScheduleSetting,
       StorageSetting,
       CategorySetting
   }

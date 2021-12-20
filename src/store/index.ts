@@ -99,7 +99,7 @@ class RootStoreMutations extends Mutations<RootStoreState> {
         schedule.taskTypes ||= oldSchedule.taskTypes
         schedule.defaultTaskType = schedule.taskTypes!.find(x => x.id === schedule.defaultTaskTypeId)!
         for (const task of schedule.tasks!) {
-            task.taskType ||= schedule.taskTypes!.find(x => x.id === task.typeId)!
+            task.taskType = schedule.taskTypes!.find(x => x.id === task.typeId)!
         }
         this.state.schedule = schedule
         this.state.hasNotSavedChanges = true

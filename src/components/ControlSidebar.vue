@@ -20,12 +20,12 @@
         <!--#region Кнопка сохранения-->
         <b-field class="w-100">
             <p class="control is-fullwidth is-expanded">
-                <b-button label="Сохранить" expanded type="is-info" :disabled="!hasChanges" @click="saveByLastMethod"/>
+                <b-button label="Сохранить" expanded type="is-info" :outlined="!hasChanges" @click="saveByLastMethod"/>
             </p>
             <p class="control">
-                <b-dropdown position="is-bottom-left" :disabled="!hasChanges">
+                <b-dropdown position="is-bottom-left">
                     <template #trigger>
-                        <b-button type="is-info">
+                        <b-button type="is-info" :outlined="!hasChanges">
                             <fa-icon icon="plus"/>
                         </b-button>
                     </template>
