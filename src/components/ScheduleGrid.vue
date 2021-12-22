@@ -22,7 +22,8 @@
             </div>
 
             <!-- Задачи -->
-            <div class="h-100 w-100 task-cell box" v-for="vm of taskDisplayVms"
+            <div class="h-100 w-100 task-cell box" :class="{'selected-task': vm.isSelected}" v-for="vm of taskDisplayVms"
+                 @click="selectTask(vm.id)"
                  :style="vm.styles">
                 <b-checkbox size="is-small" :value="vm.isDone" @input="markTaskAsDone(vm.id, $event)"/>
                 <span class="truncated-text" :title="vm.name">
@@ -48,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Ref, Vue} from "vue-property-decorator";
+import {Component, Ref, VModel, Vue} from "vue-property-decorator";
 import {ModalProgrammatic} from "buefy";
 import moment, {Duration, Moment} from "moment";
 import {rootStoreModule} from "@/store";
@@ -74,6 +75,9 @@ interface EditedCellDisplayVm extends EmptyCellDisplayVm {
 
 @Component
 export default class ScheduleGrid extends Vue {
+    @VModel({type: String})
+    selectedTaskId: string | undefined;
+
     get storeContext() {
         return rootStoreModule.context(this.$store);
     }
@@ -186,7 +190,7 @@ export default class ScheduleGrid extends Vue {
         const segmentLength = context.state.schedule.segmentLength.asMilliseconds();
         const weekBegin = this.dateInSelectedWeek.clone().startOf('isoWeek');
 
-        const map = this.taskOfSelectedWeek.map(x => {
+        return this.taskOfSelectedWeek.map(x => {
             const rowStart = Math.floor((x.begin.diff(x.begin.clone().startOf('day')) - dayBegin) / segmentLength);
             const rowEnd = Math.floor((x.end.diff(x.end.clone().startOf('day')) - dayBegin) / segmentLength);
 
@@ -194,6 +198,7 @@ export default class ScheduleGrid extends Vue {
                 name: x.name,
                 id: x.id,
                 isDone: x.isDone,
+                isSelected: x.id === this.selectedTaskId,
                 styles: {
                     'grid-column-start': 2 + moment.duration(x.begin.diff(weekBegin)).days(),
                     'grid-column-end': 3 + moment.duration(x.begin.diff(weekBegin)).days(),
@@ -204,7 +209,6 @@ export default class ScheduleGrid extends Vue {
                 },
             });
         });
-        return map;
     }
 
     //#region Создание задачи
@@ -220,6 +224,8 @@ export default class ScheduleGrid extends Vue {
             ...cellDisplayVm,
             value: "Новая задача"
         }
+
+        this.selectTask(undefined);
 
         // Даём управление Vue, чтобы он отрисовал элементы
         await delay(0);
@@ -248,6 +254,7 @@ export default class ScheduleGrid extends Vue {
     removeTask(taskId: string, force: boolean = false) {
         // Todo: Открывать окно подтверждения
         this.storeContext.actions.removeTask(taskId);
+        this.selectTask(undefined);
     }
 
     markTaskAsDone(taskId: string, isDone: boolean) {
@@ -260,6 +267,11 @@ export default class ScheduleGrid extends Vue {
             component: TaskEditorCard,
             props: { taskId }
         })
+    }
+
+    selectTask(taskId: string | undefined) {
+        this.selectedTaskId = taskId;
+        this.$emit("input", taskId)
     }
 
     private dateInSelectedWeek = moment();
@@ -332,5 +344,10 @@ export default class ScheduleGrid extends Vue {
         flex-direction: column;
         justify-content: space-evenly;
     }
+}
+
+.selected-task {
+    position: relative;
+    top: -0.25em;
 }
 </style>

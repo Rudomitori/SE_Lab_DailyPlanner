@@ -19,8 +19,8 @@ export function cloneTask(task: Task, taskTypeNavOpt = NavPropertyCloneOption.Se
         id: task.id,
         typeId: task.typeId,
         name: task.name,
-        begin: task.begin,
-        end: task.end,
+        begin: task.begin.clone(),
+        end: task.end.clone(),
         isDone: task.isDone,
         description: task.description,
 

@@ -4,11 +4,12 @@ import AppSettings, {StorageTypes} from "@/Models/AppSettings";
 import moment, {Moment} from "moment";
 import {v4} from "uuid";
 import TaskType from "@/Models/TaskType";
-import Task from "@/Models/Task";
+import Task, {cloneTask} from "@/Models/Task";
 import Vue from "vue";
 import Vuex from 'vuex'
 import localStorageService from "@/storages/localStorageService";
 import fileStorageService from "@/storages/fileStorageService";
+import {NavPropertyCloneOption} from "@/utils";
 
 class RootStoreState {
     hasNotSavedChanges: boolean = false;
@@ -70,9 +71,11 @@ class RootStoreGetters extends Getters<RootStoreState> {
 }
 
 class RootStoreMutations extends Mutations<RootStoreState> {
-    addTask({task}: {task: Task}) {
-        this.state.schedule.tasks!.push(task);
-        this.state.hasNotSavedChanges = true;
+    addTasks(tasks: Task[]) {
+        for (const task of tasks) {
+            this.state.schedule.tasks!.push(task);
+            this.state.hasNotSavedChanges = true;
+        }
     }
 
     removeTask({taskId}: {taskId: string}) {
@@ -129,7 +132,7 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
             description: null
         }
 
-        this.mutations.addTask({task: newTask})
+        this.mutations.addTasks([newTask])
     }
 
     updateTask(task: Task) {
@@ -171,6 +174,25 @@ class RootStoreActions extends Actions<RootStoreState, RootStoreGetters, RootSto
         this.mutations.updateAppSettings(settings)
 
         localStorageService.saveAppSettings(settings)
+    }
+
+    duplicateTask({taskId, prevCount, nextCount}: {taskId: string, prevCount: number, nextCount: number}) {
+        const sourceTask = this.getters.tasks.find(x => x.id === taskId)!;
+        const newTasks = [] as Task[]
+        for (let i = 0; i < prevCount; i++) {
+            const clonedTask = cloneTask(sourceTask, NavPropertyCloneOption.Include);
+            clonedTask.begin.subtract(i + 1, 'week');
+            clonedTask.end.subtract(i + 1, 'week')
+            newTasks.push(clonedTask);
+        }
+        for (let i = 0; i < nextCount; i++) {
+            const clonedTask = cloneTask(sourceTask, NavPropertyCloneOption.Include);
+            clonedTask.begin.add(i + 1, 'week');
+            clonedTask.end.add(i + 1, 'week')
+            newTasks.push(clonedTask);
+        }
+
+        this.mutations.addTasks(newTasks);
     }
 
     //#region LocalStorage

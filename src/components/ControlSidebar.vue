@@ -64,6 +64,7 @@
             </p>
         </b-field>
         <!--#endregion-->
+        <slot/>
     </div>
 </template>
 
